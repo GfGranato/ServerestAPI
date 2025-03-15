@@ -22,20 +22,18 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Create dir for reports
-        run: |
-          mkdir testArtifacts
+      - run: mkdir testArtifacts
 
       - name: Install Newman
-        run: |
-          npm install -g newman
-          npm i newman-reporter-htmlextra
+      - run: npm install -g newman
+      - run: npm i newman-reporter-htmlextra
 
       - name: Run Test
-        run: |
-          newman run Serverest.dev.postman_collection.json -e ServeRest.postman_environment.json -r cli,htmlextra
+      - run: newman run Serverest.dev.postman_collection.json -e ServeRest.postman_environment.json -r cli,htmlextra
 
       - name: Report
         uses: actions/upload-artifact@v4
+        if: success() || failure()
         with:
           name: Reports
           path: newman
