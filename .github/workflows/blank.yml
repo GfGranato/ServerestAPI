@@ -39,10 +39,3 @@ jobs:
           name: Reports
           path: newman/report.html
           overwrite: true
-          
-      - name: HTML Preview
-        id: html_preview
-        uses: pavi2410/html-preview-action@v2
-        with:
-          html_file: 'report.html'
-          job_summary: true
