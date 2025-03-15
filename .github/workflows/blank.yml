@@ -19,7 +19,7 @@ jobs:
   newman:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Create dir for reports
         run: |
@@ -35,7 +35,7 @@ jobs:
           newman run Serverest.dev.postman_collection.json -e ServeRest.postman_environment.json -r cli,htmlextra
 
       - name: Report
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-pages-artifact@v3
         with:
           name: Reports
           path: newman
