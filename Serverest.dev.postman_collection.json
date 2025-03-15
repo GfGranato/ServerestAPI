@@ -737,7 +737,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"RepeatTolima@qa.com.br\",\r\n  \"password\": \"show\"\r\n}",
+							"raw": "{\r\n  \"email\": \"fulano@qa.com\",\r\n  \"password\": \"teste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
