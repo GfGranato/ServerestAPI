@@ -15,7 +15,7 @@ This project consists of an automation test suite designed to test APIs using Ne
 Before running the tests, ensure that you have the following:
 - Node.js: Newman requires Node.js. You can download it from [Node.js official website](https://nodejs.org/);
 - Newman: Install Newman globally via npm:\
-`npm install -g newman`\
+`npm install -g newman`
 - Postman Collection: The Postman collection file (.json) that contains the API tests should be available in the project repository.
 
 ## Running locally on Postman
