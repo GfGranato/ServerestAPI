@@ -31,5 +31,5 @@ To execute the test:
 `newman run Serverest.dev.postman_collection.json -e ServeRest.postman_environment.json -r cli,htmlextra`\
 This command will run the test suit and generate a html file that can be opened on any browser.
 
-##License
+## License
 This project is licensed under the MIT License.
