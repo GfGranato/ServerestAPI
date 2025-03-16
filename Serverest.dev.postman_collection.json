@@ -48,6 +48,61 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "new Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.unset('product')\r",
+									"pm.collectionVariables.unset('price')\r",
+									"pm.collectionVariables.unset('description')\r",
+									"pm.collectionVariables.unset('amount')\r",
+									"\r",
+									"let prodId = Math.floor(Math.random() * 19) \r",
+									"pm.collectionVariables.set('product', pm.response.json()[prodId].title)\r",
+									"pm.collectionVariables.set('price', pm.response.json()[prodId].price)\r",
+									"pm.collectionVariables.set('description', pm.response.json()[prodId].description)\r",
+									"pm.collectionVariables.set('amount', Math.floor(Math.random() * 20) +1)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://fakestoreapi.com/products",
+							"protocol": "https",
+							"host": [
+								"fakestoreapi",
+								"com"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "Generate Random data from API: https://randomuser.me/api/EndFragment"
@@ -74,9 +129,6 @@
 									"});\r",
 									"\r",
 									"pm.test('Schema is valid', function () {\r",
-									"    console.log(pm.globals.get('schema'))\r",
-									"    console.log('  #####  ')\r",
-									"    console.log(pm.response.json())\r",
 									"    pm.expect(ajv.validate(pm.globals.get('schema'), pm.response.json()),\r",
 									"    JSON.stringify(ajv.errors)).to.be.true;\r",
 									"});\r",
@@ -553,6 +605,10 @@
 									"    JSON.stringify(ajv.errors)).to.be.true;\r",
 									"});\r",
 									"\r",
+									"pm.collectionVariables.set('successEmail',pm.response.json().usuarios[0].email)\r",
+									"\r",
+									"pm.collectionVariables.set('successPassword',pm.response.json().usuarios[0].password)\r",
+									"\r",
 									""
 								],
 								"type": "text/javascript",
@@ -725,7 +781,19 @@
 									"\r",
 									"pm.test(\"Body matches message\", function () {\r",
 									"    pm.expect(pm.response.text()).to.include(\"Login realizado com sucesso\");\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set('BearerToken', pm.response.json().authorization.split(' ').pop())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -737,7 +805,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"fulano@qa.com\",\r\n  \"password\": \"teste\"\r\n}",
+							"raw": "{\r\n  \"email\": \"{{successEmail}}\",\r\n  \"password\": \"{{successPassword}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -804,7 +872,482 @@
 		},
 		{
 			"name": "Products",
-			"item": []
+			"item": [
+				{
+					"name": "All Products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const Ajv = require('ajv')\r",
+									"const ajv = new Ajv({allErrors: true, verbose: true})\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test('Schema is valid', function () {\r",
+									"    pm.expect(tv4.validate(pm.collectionVariables.get('schema'), pm.response.json())).to.be.true;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.unset('schema')\r",
+									"pm.collectionVariables.set('schema', {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"quantidade\": {\r",
+									"      \"type\": \"integer\"\r",
+									"    },\r",
+									"    \"produtos\": {\r",
+									"      \"type\": \"array\",\r",
+									"      \"items\": [\r",
+									"        {\r",
+									"          \"type\": \"object\",\r",
+									"          \"properties\": {\r",
+									"            \"nome\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"preco\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"descricao\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"quantidade\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"_id\": {\r",
+									"              \"type\": \"string\"\r",
+									"            }\r",
+									"          },\r",
+									"          \"required\": [\r",
+									"            \"nome\",\r",
+									"            \"preco\",\r",
+									"            \"descricao\",\r",
+									"            \"quantidade\",\r",
+									"            \"_id\"\r",
+									"          ]\r",
+									"        },\r",
+									"        {\r",
+									"          \"type\": \"object\",\r",
+									"          \"properties\": {\r",
+									"            \"nome\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"preco\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"descricao\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"quantidade\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"_id\": {\r",
+									"              \"type\": \"string\"\r",
+									"            }\r",
+									"          },\r",
+									"          \"required\": [\r",
+									"            \"nome\",\r",
+									"            \"preco\",\r",
+									"            \"descricao\",\r",
+									"            \"quantidade\",\r",
+									"            \"_id\"\r",
+									"          ]\r",
+									"        },\r",
+									"        {\r",
+									"          \"type\": \"object\",\r",
+									"          \"properties\": {\r",
+									"            \"nome\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"preco\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"descricao\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"quantidade\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"_id\": {\r",
+									"              \"type\": \"string\"\r",
+									"            }\r",
+									"          },\r",
+									"          \"required\": [\r",
+									"            \"nome\",\r",
+									"            \"preco\",\r",
+									"            \"descricao\",\r",
+									"            \"quantidade\",\r",
+									"            \"_id\"\r",
+									"          ]\r",
+									"        },\r",
+									"        {\r",
+									"          \"type\": \"object\",\r",
+									"          \"properties\": {\r",
+									"            \"nome\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"preco\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"descricao\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"quantidade\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"_id\": {\r",
+									"              \"type\": \"string\"\r",
+									"            }\r",
+									"          },\r",
+									"          \"required\": [\r",
+									"            \"nome\",\r",
+									"            \"preco\",\r",
+									"            \"descricao\",\r",
+									"            \"quantidade\",\r",
+									"            \"_id\"\r",
+									"          ]\r",
+									"        },\r",
+									"        {\r",
+									"          \"type\": \"object\",\r",
+									"          \"properties\": {\r",
+									"            \"nome\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"preco\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"descricao\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"quantidade\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"_id\": {\r",
+									"              \"type\": \"string\"\r",
+									"            }\r",
+									"          },\r",
+									"          \"required\": [\r",
+									"            \"nome\",\r",
+									"            \"preco\",\r",
+									"            \"descricao\",\r",
+									"            \"quantidade\",\r",
+									"            \"_id\"\r",
+									"          ]\r",
+									"        },\r",
+									"        {\r",
+									"          \"type\": \"object\",\r",
+									"          \"properties\": {\r",
+									"            \"nome\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"preco\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"descricao\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"quantidade\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"_id\": {\r",
+									"              \"type\": \"string\"\r",
+									"            }\r",
+									"          },\r",
+									"          \"required\": [\r",
+									"            \"nome\",\r",
+									"            \"preco\",\r",
+									"            \"descricao\",\r",
+									"            \"quantidade\",\r",
+									"            \"_id\"\r",
+									"          ]\r",
+									"        },\r",
+									"        {\r",
+									"          \"type\": \"object\",\r",
+									"          \"properties\": {\r",
+									"            \"nome\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"preco\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"descricao\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"quantidade\": {\r",
+									"              \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"imagem\": {\r",
+									"              \"type\": \"string\"\r",
+									"            },\r",
+									"            \"_id\": {\r",
+									"              \"type\": \"string\"\r",
+									"            }\r",
+									"          },\r",
+									"          \"required\": [\r",
+									"            \"nome\",\r",
+									"            \"preco\",\r",
+									"            \"descricao\",\r",
+									"            \"quantidade\",\r",
+									"            \"imagem\",\r",
+									"            \"_id\"\r",
+									"          ]\r",
+									"        }\r",
+									"      ]\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"quantidade\",\r",
+									"    \"produtos\"\r",
+									"  ]\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/produtos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"produtos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate Create message with success\", function () {\r",
+									"    pm.expect(pm.response.json().message).to.eql('Cadastro realizado com sucesso');\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set('_id', pm.response.json()._id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{BearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nome\": \"{{product}}\",\r\n  \"preco\": {{price}},\r\n  \"descricao\": \"{{description}}\",\r\n  \"quantidade\": {{amount}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/produtos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"produtos"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "product by ID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.unset('schema')\r",
+									"pm.collectionVariables.set('schema', {\r",
+									"  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"nome\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"preco\": {\r",
+									"      \"type\": \"integer\"\r",
+									"    },\r",
+									"    \"descricao\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"quantidade\": {\r",
+									"      \"type\": \"integer\"\r",
+									"    },\r",
+									"    \"_id\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"nome\",\r",
+									"    \"preco\",\r",
+									"    \"descricao\",\r",
+									"    \"quantidade\",\r",
+									"    \"_id\"\r",
+									"  ]\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const Ajv = require('ajv')\r",
+									"const ajv = new Ajv({allErrors: true, verbose: true})\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test('Schema is valid', function () {\r",
+									"    pm.expect(tv4.validate(pm.collectionVariables.get('schema'), pm.response.json())).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/produtos/{{_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"produtos",
+								"{{_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit a product by ID",
+					"request": {
+						"method": "PUT",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "product By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Validate delete message with success\", function () {\r",
+									"    pm.expect(pm.response.json().message).to.eql(\"Registro excluído com sucesso\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{BearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/produtos/{{_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"produtos",
+								"{{_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "ShopCart",
@@ -831,6 +1374,50 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "schema",
+			"value": ""
+		},
+		{
+			"key": "product",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "price",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "description",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "amount",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "successEmail",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "successPassword",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "BearerToken",
+			"value": ""
+		},
+		{
+			"key": "_id",
+			"value": ""
 		}
 	]
 }
