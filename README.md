@@ -14,8 +14,8 @@ This project consists of an automation test suite designed to test APIs using Ne
 ## Prerequisites
 Before running the tests, ensure that you have the following:
 - Node.js: Newman requires Node.js. You can download it from [Node.js official website](https://nodejs.org/);
-- Newman: Install Newman globally via npm:
-`npm install -g newman`
+- Newman: Install Newman globally via npm:\
+`npm install -g newman`\
 - Postman Collection: The Postman collection file (.json) that contains the API tests should be available in the project repository.
 
 ## Running locally on Postman
@@ -27,8 +27,8 @@ Before running the tests, ensure that you have the following:
 ## Running Tests on Newman
 To execute the test:
 - Open the Terminal and go to your project folder
-- Run the comand line:
-`newman run Serverest.dev.postman_collection.json -e ServeRest.postman_environment.json -r cli,htmlextra`
+- Run the comand line:\
+`newman run Serverest.dev.postman_collection.json -e ServeRest.postman_environment.json -r cli,htmlextra`\
 This command will run the test suit and generate a html file that can be opened on any browser.
 
 ##License
