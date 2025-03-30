@@ -56,8 +56,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 201\", function () {\r",
-									"    pm.response.to.have.status(201);\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
 									"\r",
 									"});\r",
 									"\r",
@@ -68,7 +68,7 @@
 									"\r",
 									"let prodId = Math.floor(Math.random() * 19) \r",
 									"pm.collectionVariables.set('product', pm.response.json()[prodId].title)\r",
-									"pm.collectionVariables.set('price', pm.response.json()[prodId].price)\r",
+									"pm.collectionVariables.set('price', Math.trunc(Math.floor(pm.response.json()[prodId].price)))\r",
 									"pm.collectionVariables.set('description', pm.response.json()[prodId].description)\r",
 									"pm.collectionVariables.set('amount', Math.floor(Math.random() * 20) +1)"
 								],
@@ -1144,8 +1144,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
 									"});\r",
 									"\r",
 									"pm.test(\"Validate Create message with success\", function () {\r",
